@@ -47,64 +47,94 @@ function createFireIcon(frp, isGambut) {
   });
 }
 
-// 1. Memuat Data Titik Karhutla via WFS (Pillar 2 & 4)
+// 1. Memuat Data Titik Karhutla via WFS (Pillar 2 & 4) dengan Fallback Data Aktual Bundled
 async function muatDataKarhutlaWFS() {
   const statusEl = document.getElementById('syncStatusText');
-  if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat data WFS...';
+  if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat data...';
 
-  try {
-    const baseUrl = window.location.origin.includes('3000') ? '/geoserver' : 'http://localhost:8080/geoserver';
-    const u = new URL(`${baseUrl}/praktikum/ows`);
-    const p = u.searchParams;
+  // Deteksi lingkungan GitHub Pages / HTTPS eksternal (Mixed content prevention)
+  const isExternalHttps = window.location.protocol === 'https:' && !window.location.host.includes('localhost');
 
-    p.set('service', 'WFS');
-    p.set('version', '2.0.0');
-    p.set('request', 'GetFeature');
-    p.set('typeNames', 'praktikum:kejadian_karhutla_kalimantan');
-    p.set('outputFormat', 'application/json');
-    p.set('srsName', 'EPSG:4326');
-    
-    // Pilar 2: Hanya ambil kolom yang dibutuhkan tanpa redundansi
-    p.set('propertyName', 'id,id_kejadian,kode_prov,provinsi,kabupaten,kecamatan,tgl_kejadian,jam_kejadian,tahun,bulan,luas_terdampak_ha,frp_mw,confidence,satelit,tipe_lahan,is_gambut,status_penanganan,geom');
+  if (!isExternalHttps) {
+    try {
+      const baseUrl = window.location.origin.includes('3000') ? '/geoserver' : 'http://localhost:8080/geoserver';
+      const u = new URL(`${baseUrl}/praktikum/ows`);
+      const p = u.searchParams;
 
-    // Pilar 4: Bangun CQL_FILTER jika ada filter aktif
-    const cqlParts = [];
+      p.set('service', 'WFS');
+      p.set('version', '2.0.0');
+      p.set('request', 'GetFeature');
+      p.set('typeNames', 'praktikum:kejadian_karhutla_kalimantan');
+      p.set('outputFormat', 'application/json');
+      p.set('srsName', 'EPSG:4326');
+      p.set('propertyName', 'id,id_kejadian,kode_prov,provinsi,kabupaten,kecamatan,tgl_kejadian,jam_kejadian,tahun,bulan,luas_terdampak_ha,frp_mw,confidence,satelit,tipe_lahan,is_gambut,status_penanganan,geom');
+
+      const cqlParts = [];
+      if (KarhutlaState.filterTahun !== 'semua') {
+        cqlParts.push(`tahun = ${KarhutlaState.filterTahun}`);
+      }
+      if (KarhutlaState.filterBulan !== 'semua') {
+        cqlParts.push(`bulan = ${KarhutlaState.filterBulan}`);
+      }
+      if (KarhutlaState.filterStatus !== 'semua') {
+        cqlParts.push(`status_penanganan = '${KarhutlaState.filterStatus}'`);
+      }
+
+      if (cqlParts.length > 0) {
+        p.set('CQL_FILTER', cqlParts.join(' AND '));
+      }
+
+      const t0 = performance.now();
+      const res = await fetch(u.toString());
+      const geojson = await res.json();
+      const duration = Math.round(performance.now() - t0);
+
+      KarhutlaState.rawFeatures = (geojson.features || []).map(f => ({
+        ...f.properties,
+        geometry: f.geometry,
+        coordinates: f.geometry.coordinates
+      }));
+
+      filterDanRender();
+
+      if (statusEl) {
+        statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981;"></i> WFS Sync: ${KarhutlaState.rawFeatures.length} titik (${duration} ms)`;
+      }
+
+      KarhutlaState.countdown = 60;
+      return;
+    } catch(err) {
+      console.warn('WFS lokal tidak merespons, beralih ke Fallback Data Aktual Bundled...', err);
+    }
+  }
+
+  // Fallback Otomatis untuk GitHub Pages / Offline Mode
+  if (typeof dataKarhutlaAktual !== 'undefined' && dataKarhutlaAktual.features) {
+    let features = dataKarhutlaAktual.features;
+
+    // Filter dinamis klien
     if (KarhutlaState.filterTahun !== 'semua') {
-      cqlParts.push(`tahun = ${KarhutlaState.filterTahun}`);
+      features = features.filter(f => f.properties.tahun == KarhutlaState.filterTahun);
     }
     if (KarhutlaState.filterBulan !== 'semua') {
-      cqlParts.push(`bulan = ${KarhutlaState.filterBulan}`);
+      features = features.filter(f => f.properties.bulan == KarhutlaState.filterBulan);
     }
     if (KarhutlaState.filterStatus !== 'semua') {
-      cqlParts.push(`status_penanganan = '${KarhutlaState.filterStatus}'`);
+      features = features.filter(f => f.properties.status_penanganan === KarhutlaState.filterStatus);
     }
 
-    if (cqlParts.length > 0) {
-      p.set('CQL_FILTER', cqlParts.join(' AND '));
-    }
-
-    const t0 = performance.now();
-    const res = await fetch(u.toString());
-    const geojson = await res.json();
-    const duration = Math.round(performance.now() - t0);
-
-    KarhutlaState.rawFeatures = (geojson.features || []).map(f => ({
+    KarhutlaState.rawFeatures = features.map(f => ({
       ...f.properties,
       geometry: f.geometry,
       coordinates: f.geometry.coordinates
     }));
 
-    // Terapkan filter wilayah klien jika ada provinsi terpilih
     filterDanRender();
 
     if (statusEl) {
-      statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981;"></i> WFS Sync: ${KarhutlaState.rawFeatures.length} titik (${duration} ms)`;
+      statusEl.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981;"></i> Data Aktual: ${KarhutlaState.rawFeatures.length} Titik (Aktif)`;
     }
-
-    // Reset countdown polling
-    KarhutlaState.countdown = 60;
-  } catch(err) {
-    console.error('Gagal memuat WFS Karhutla:', err);
+  } else {
     if (statusEl) statusEl.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:#ef4444;"></i> Gagal sinkron WFS`;
   }
 }
