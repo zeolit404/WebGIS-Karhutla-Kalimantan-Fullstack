@@ -86,6 +86,7 @@ async function muatDataKarhutlaWFS() {
 
       const t0 = performance.now();
       const res = await fetch(u.toString());
+      if (!res.ok) throw new Error('WFS HTTP ' + res.status);
       const geojson = await res.json();
       const duration = Math.round(performance.now() - t0);
 
@@ -120,7 +121,7 @@ async function muatDataKarhutlaWFS() {
       features = features.filter(f => f.properties.bulan == KarhutlaState.filterBulan);
     }
     if (KarhutlaState.filterStatus !== 'semua') {
-      features = features.filter(f => f.properties.status_penanganan === KarhutlaState.filterStatus);
+      features = features.filter(f => (f.properties.status_penanganan || '').includes(KarhutlaState.filterStatus));
     }
 
     KarhutlaState.rawFeatures = features.map(f => ({
@@ -158,6 +159,9 @@ function filterDanRender() {
 
 // Render Titik di Peta Leaflet
 function renderMarkers(items) {
+  if (typeof map !== 'undefined' && !map.hasLayer(karhutlaLayerGroup)) {
+    karhutlaLayerGroup.addTo(map);
+  }
   karhutlaLayerGroup.clearLayers();
 
   items.forEach(item => {
@@ -379,10 +383,12 @@ function startPollingTimer() {
   }, 1000);
 }
 
-// Inisialisasi saat peta siap
-window.addEventListener('DOMContentLoaded', () => {
+// Inisialisasi saat peta dan dokumen siap
+function bootKarhutlaDashboard() {
   if (typeof map !== 'undefined') {
-    karhutlaLayerGroup.addTo(map);
+    if (!map.hasLayer(karhutlaLayerGroup)) {
+      karhutlaLayerGroup.addTo(map);
+    }
 
     // Tambahkan layer ke layer control jika tersedia
     if (typeof overlayMaps !== 'undefined' && typeof layerControl !== 'undefined') {
@@ -395,4 +401,10 @@ window.addEventListener('DOMContentLoaded', () => {
   initCharts();
   muatDataKarhutlaWFS();
   startPollingTimer();
-});
+}
+
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', bootKarhutlaDashboard);
+} else {
+  bootKarhutlaDashboard();
+}
