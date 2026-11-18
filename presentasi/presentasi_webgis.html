@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentasi WebGIS Kalimantan - Karhutla</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @page {
+            size: A4 landscape;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #1a1a2e;
+            color: #333;
+        }
+
+        .slide {
+            width: 297mm;
+            height: 210mm;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide:last-child {
+            page-break-after: auto;
+        }
+
+        /* ============ SLIDE 1: COVER ============ */
+        .slide-cover {
+            background: linear-gradient(135deg, #0c1426 0%, #16213e 30%, #1a3a5c 60%, #0f3460 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .cover-bg-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(72, 149, 239, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(76, 201, 240, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(247, 37, 133, 0.05) 0%, transparent 60%);
+        }
+
+        .cover-top-bar {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #e63946, #f77f00, #fcbf49, #2a9d8f, #264653);
+        }
+
+        .cover-content {
+            position: relative;
+            z-index: 2;
+            padding: 20mm 30mm;
+        }
+
+        .cover-university {
+            font-size: 13pt;
+            font-weight: 400;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 6mm;
+        }
+
+        .cover-faculty {
+            font-size: 10pt;
+            font-weight: 300;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 12mm;
+        }
+
+        .cover-title {
+            font-size: 28pt;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 4mm;
+            background: linear-gradient(135deg, #ffffff 0%, #4cc9f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            font-weight: 400;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 15mm;
+        }
+
+        .cover-divider {
+            width: 80mm;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4cc9f0, transparent);
+            margin: 0 auto 12mm;
+        }
+
+        .cover-info {
+            font-size: 11pt;
+            line-height: 2;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .cover-info strong {
+            color: #4cc9f0;
+        }
+
+        .cover-mata-kuliah {
+            display: inline-block;
+            margin-top: 8mm;
+            padding: 3mm 8mm;
+            background: rgba(76, 201, 240, 0.15);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            border-radius: 6px;
+            font-size: 10pt;
+            color: #4cc9f0;
+        }
+
+        .cover-link {
+            position: absolute;
+            bottom: 12mm;
+            left: 0; right: 0;
+            text-align: center;
+            font-size: 9pt;
+            color: rgba(255,255,255,0.5);
+        }
+        .cover-link a {
+            color: #4cc9f0;
+            text-decoration: none;
+        }
+
+        /* ============ CONTENT SLIDES ============ */
+        .slide-content {
+            background: #ffffff;
+        }
+
+        .slide-header {
+            background: linear-gradient(135deg, #16213e, #1a3a5c);
+            color: white;
+            padding: 6mm 12mm;
+            display: flex;
+            align-items: center;
+            gap: 4mm;
+        }
+
+        .slide-number {
+            width: 10mm;
+            height: 10mm;
+            border-radius: 50%;
+            background: rgba(76, 201, 240, 0.2);
+            border: 2px solid #4cc9f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12pt;
+            font-weight: 700;
+            color: #4cc9f0;
+            flex-shrink: 0;
+        }
+
+        .slide-header-text h2 {
+            font-size: 16pt;
+            font-weight: 700;
+        }
+
+        .slide-header-text p {
+            font-size: 9pt;
+            color: rgba(255,255,255,0.6);
+            margin-top: 1mm;
+        }
+
+        .slide-body {
+            flex: 1;
+            padding: 6mm 10mm;
+            display: flex;
+            gap: 6mm;
+        }
+
+        .slide-body.col-2 {
+            flex-direction: row;
+        }
+
+        .slide-body.col-1 {
+            flex-direction: column;
+        }
+
+        .col-left, .col-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4mm;
+        }
+
+        .col-left { flex: 0 0 55%; }
+        .col-right { flex: 0 0 43%; }
+
+        .col-left.wide { flex: 0 0 60%; }
+        .col-right.narrow { flex: 0 0 38%; }
+
+        .text-block {
+            font-size: 9.5pt;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .text-block h3 {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #16213e;
+            margin-bottom: 2mm;
+        }
+
+        .text-block ul {
+            padding-left: 5mm;
+        }
+
+        .text-block li {
+            margin-bottom: 1.5mm;
+        }
+
+        .text-block .highlight {
+            background: rgba(76, 201, 240, 0.1);
+            border-left: 3px solid #4cc9f0;
+            padding: 2mm 3mm;
+            margin: 2mm 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 9pt;
+        }
+
+        .screenshot {
+            border-radius: 4px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .screenshot-full {
+            width: 100%;
+            height: auto;
+            max-height: 135mm;
+        }
+
+        .screenshot-side {
+            width: 100%;
+            height: auto;
+            max-height: 120mm;
+        }
+
+        .screenshot-small {
+            max-height: 55mm;
+        }
+
+        .img-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2mm;
+        }
+
+        .img-container.row {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .img-caption {
+            font-size: 8pt;
+            color: #888;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3mm;
+        }
+
+        .feature-card {
+            padding: 3mm 4mm;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #4cc9f0;
+        }
+
+        .feature-card h4 {
+            font-size: 9pt;
+            font-weight: 600;
+            color: #16213e;
+            margin-bottom: 1mm;
+        }
+
+        .feature-card p {
+            font-size: 8pt;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            padding: 1mm 3mm;
+            background: #e8f4fd;
+            color: #0c7cd5;
+            border-radius: 3px;
+            font-size: 8pt;
+            font-weight: 500;
+            margin: 0.5mm;
+        }
+
+        .tech-badge.green { background: #e8fdf0; color: #0ca55e; }
+        .tech-badge.orange { background: #fdf3e8; color: #c5700a; }
+        .tech-badge.red { background: #fde8e8; color: #c50a0a; }
+        .tech-badge.purple { background: #f0e8fd; color: #6c0ac5; }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 2mm;
+            padding: 1.5mm 3mm;
+            border-radius: 3px;
+            font-size: 8.5pt;
+            font-weight: 600;
+        }
+        .status-red { background: rgba(230,57,70,0.1); color: #e63946; }
+        .status-orange { background: rgba(247,127,0,0.1); color: #f77f00; }
+        .status-yellow { background: rgba(252,191,73,0.15); color: #b8860b; }
+
+        .slide-footer {
+            padding: 2mm 10mm;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            font-size: 7.5pt;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* ============ SLIDE PENUTUP ============ */
+        .slide-closing {
+            background: linear-gradient(135deg, #0c1426 0%, #16213e 40%, #1a3a5c 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .closing-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .closing-title {
+            font-size: 24pt;
+            font-weight: 800;
+            margin-bottom: 8mm;
+            background: linear-gradient(135deg, #ffffff 0%, #4cc9f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .closing-link-box {
+            display: inline-block;
+            padding: 5mm 12mm;
+            background: rgba(76, 201, 240, 0.1);
+            border: 2px solid rgba(76, 201, 240, 0.4);
+            border-radius: 8px;
+            margin-bottom: 8mm;
+        }
+
+        .closing-link-box .label {
+            font-size: 9pt;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 2mm;
+        }
+
+        .closing-link-box .url {
+            font-size: 13pt;
+            font-weight: 600;
+            color: #4cc9f0;
+            word-break: break-all;
+        }
+
+        .closing-thanks {
+            font-size: 14pt;
+            color: rgba(255,255,255,0.7);
+            margin-top: 6mm;
+        }
+
+        .closing-info {
+            margin-top: 10mm;
+            font-size: 9pt;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.8;
+        }
+
+        @media print {
+            body { background: white; }
+            .slide {
+                width: 100%;
+                height: 100vh;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===================== SLIDE 1: COVER ===================== -->
+<div class="slide slide-cover">
+    <div class="cover-bg-pattern"></div>
+    <div class="cover-top-bar"></div>
+    <div class="cover-content">
+        <div class="cover-university">Universitas Hasanuddin</div>
+        <div class="cover-faculty">Fakultas Vokasi &mdash; D4 Penginderaan Jauh &amp; Sistem Informasi Geografis</div>
+
+        <div class="cover-title">WebGIS Interaktif Kalimantan<br>Mitigasi Kebakaran Hutan &amp; Lahan (Karhutla)</div>
+        <div class="cover-subtitle">Pemetaan Batas Administrasi, Jaringan Jalan, Sungai, Toponim &amp; Tutupan Lahan</div>
+
+        <div class="cover-divider"></div>
+
+        <div class="cover-info">
+            <strong>M. ARIEF ABDILLAH</strong> &mdash; V126241003<br>
+            Dosen Pengampu: <strong>Andang Suryana Soma, S.Hut., MP., Ph.D.</strong>
+        </div>
+
+        <div class="cover-mata-kuliah">
+            Praktek Pengelolaan Big Data &amp; WebGIS &mdash; Semester V
+        </div>
+    </div>
+    <div class="cover-link">
+        Akses WebGIS: <a href="https://zeolit404.github.io/WebGIS_Leaflet-Karhutla/">https://zeolit404.github.io/WebGIS_Leaflet-Karhutla/</a>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 2: PENDAHULUAN ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">1</div>
+        <div class="slide-header-text">
+            <h2>Pendahuluan &amp; Latar Belakang</h2>
+            <p>Konsep WebGIS dan Teknologi yang Digunakan</p>
+        </div>
+    </div>
+    <div class="slide-body col-2">
+        <div class="col-left">
+            <div class="text-block">
+                <h3>Latar Belakang</h3>
+                <p>Kalimantan merupakan salah satu wilayah paling rawan kebakaran hutan dan lahan (Karhutla) di Indonesia. Dengan luas lahan gambut mencapai <strong>1.907.100 Ha</strong> dan wilayah daratan <strong>53,45 juta Ha</strong>, pemantauan spasial berbasis web menjadi krusial untuk mendukung mitigasi bencana.</p>
+
+                <div class="highlight">
+                    WebGIS ini menyajikan data spasial 5 provinsi Kalimantan secara interaktif melalui browser, tanpa perlu install software GIS desktop.
+                </div>
+
+                <h3 style="margin-top:4mm;">Tujuan</h3>
+                <ul>
+                    <li>Memvisualisasikan batas administrasi 5 provinsi beserta status siaga Karhutla</li>
+                    <li>Menampilkan 5 lapisan data spasial dasar (Administrasi, Jalan, Sungai, Toponim, Tutupan Lahan)</li>
+                    <li>Menyediakan dashboard statistik dan fitur cuaca real-time</li>
+                    <li>Men-deploy WebGIS yang dapat diakses publik melalui internet</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-right">
+            <div class="text-block">
+                <h3>Teknologi yang Digunakan</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Leaflet.js</h4>
+                        <p>Library JavaScript open-source untuk peta interaktif berbasis web</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>GeoJSON</h4>
+                        <p>Format data spasial standar untuk pertukaran data geografi</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>HTML + CSS + JS</h4>
+                        <p>Teknologi web standar untuk tampilan dan interaktivitas</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>GitHub Pages</h4>
+                        <p>Hosting statis gratis untuk deploy WebGIS secara publik</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:4mm;">Sumber Data</h3>
+                <ul>
+                    <li>Batas Administrasi: PostGIS &rarr; GeoJSON</li>
+                    <li>Jaringan Jalan Trans-Kalimantan</li>
+                    <li>Sungai Utama (disederhanakan 16MB &rarr; 725KB)</li>
+                    <li>Toponim: Ibu Kota &amp; Posko Pantau Karhutla</li>
+                    <li>Tutupan Lahan / KHG Gambut</li>
+                    <li>Cuaca: Open-Meteo API (real-time)</li>
+                    <li>Radar: RainViewer API</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 1</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 3: TAMPILAN UTAMA ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">2</div>
+        <div class="slide-header-text">
+            <h2>Tampilan Utama WebGIS</h2>
+            <p>Antarmuka Peta dengan Basemap OpenStreetMap dan Semua Layer Aktif</p>
+        </div>
+    </div>
+    <div class="slide-body col-1">
+        <div class="img-container">
+            <img src="ss1_overview.png" class="screenshot screenshot-full" alt="Tampilan Utama WebGIS">
+            <div class="img-caption">Gambar 1. Tampilan utama WebGIS Kalimantan dengan basemap OSM, panel statistik, dan legenda</div>
+        </div>
+        <div class="text-block" style="margin-top:2mm;">
+            <p>Antarmuka WebGIS terdiri dari: <strong>Navbar</strong> (judul + indikator status siaga), <strong>Panel Statistik Spasial</strong> (kiri), <strong>Peta Interaktif</strong> (tengah), <strong>Layer Control</strong> (kanan atas), <strong>Legenda</strong> (kanan bawah), dan <strong>Koordinat Tracker</strong> (bawah tengah). Semua komponen dirancang responsif dan dapat di-toggle untuk memaksimalkan area peta.</p>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 2</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 4: BASEMAP & LAYER CONTROL ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">3</div>
+        <div class="slide-header-text">
+            <h2>Peta Dasar (Basemaps) &amp; Kontrol Layer</h2>
+            <p>3 Pilihan Basemap dan 8 Layer Overlay yang Dapat Diaktifkan</p>
+        </div>
+    </div>
+    <div class="slide-body col-2">
+        <div class="col-left wide">
+            <div class="text-block">
+                <h3>Basemaps Tersedia</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>OpenStreetMap (Standar)</h4>
+                        <p>Peta jalan dan bangunan detail, cocok untuk navigasi umum</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Esri Citra Satelit</h4>
+                        <p>Citra satelit resolusi tinggi dari Esri World Imagery</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Esri Topografi &amp; Relief</h4>
+                        <p>Peta topografi dengan informasi elevasi dan relief</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:4mm;">Overlay Layers (8 Layer)</h3>
+                <ul>
+                    <li><strong>Batas Administrasi</strong> &mdash; Choropleth 5 provinsi dengan status siaga</li>
+                    <li><strong>Tutupan Lahan (KHG Gambut)</strong> &mdash; Kawasan restorasi gambut</li>
+                    <li><strong>Jaringan Jalan Trans-Kalimantan</strong> &mdash; 4 poros jalan utama</li>
+                    <li><strong>Jaringan Sungai Utama</strong> &mdash; Aliran sungai besar Kalimantan</li>
+                    <li><strong>Toponim &amp; Posko Pantau</strong> &mdash; Ibu kota dan posko karhutla</li>
+                    <li><strong>Radar Cuaca (RainViewer)</strong> &mdash; Overlay curah hujan real-time</li>
+                    <li><strong>Pergerakan &amp; Arah Angin</strong> &mdash; Vektor angin 8 stasiun</li>
+                    <li><strong>WMS GeoServer (Opsional)</strong> &mdash; Koneksi ke server GeoServer</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-right narrow">
+            <div class="img-container">
+                <img src="ss2_layer_control.png" class="screenshot" style="max-height:70mm;" alt="Layer Control">
+                <div class="img-caption">Gambar 2. Panel Layer Control</div>
+            </div>
+            <div class="img-container" style="margin-top:3mm;">
+                <img src="ss3_legenda1.png" class="screenshot" style="max-height:55mm;" alt="Legenda Peta">
+                <div class="img-caption">Gambar 3. Legenda Peta</div>
+            </div>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 3</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 5: 5 LAPISAN DATA SPASIAL ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">4</div>
+        <div class="slide-header-text">
+            <h2>5 Lapisan Data Spasial Dasar</h2>
+            <p>Batas Administrasi, Jalan, Sungai, Toponim, dan Tutupan Lahan</p>
+        </div>
+    </div>
+    <div class="slide-body col-2">
+        <div class="col-left wide">
+            <div class="img-container">
+                <img src="ss5_popup.png" class="screenshot" style="max-height:115mm;" alt="Popup Interaktif">
+                <div class="img-caption">Gambar 4. Popup interaktif menampilkan atribut data provinsi</div>
+            </div>
+        </div>
+        <div class="col-right narrow">
+            <div class="text-block">
+                <h3>1. Batas Administrasi</h3>
+                <p>Choropleth polygon 5 provinsi dengan klasifikasi status:</p>
+                <div style="margin: 2mm 0;">
+                    <span class="status-indicator status-red">Siaga I</span> Kalteng &amp; Kaltim<br>
+                    <span class="status-indicator status-orange">Siaga II</span> Kalbar &amp; Kalsel<br>
+                    <span class="status-indicator status-yellow">Waspada</span> Kaltara
+                </div>
+
+                <h3 style="margin-top:3mm;">2. Jaringan Jalan</h3>
+                <p>Jalan Trans-Kalimantan (4 poros) dengan total 2.568 km. Ditampilkan sebagai garis merah putus-putus.</p>
+
+                <h3 style="margin-top:3mm;">3. Jaringan Sungai</h3>
+                <p>Sungai-sungai utama Kalimantan. Data disederhanakan dari 16MB menjadi 725KB menggunakan ST_Simplify.</p>
+
+                <h3 style="margin-top:3mm;">4. Toponim</h3>
+                <p>11 titik penting: 6 ibu kota provinsi/kota dan 5 posko pantau karhutla. Masing-masing dengan marker icon berbeda.</p>
+
+                <h3 style="margin-top:3mm;">5. Tutupan Lahan (KHG)</h3>
+                <p>Kawasan Hidrologi Gambut (KHG) dengan total 1.907.100 Ha meliputi kawasan restorasi gambut.</p>
+            </div>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 4</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 6: DASHBOARD STATISTIK ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">5</div>
+        <div class="slide-header-text">
+            <h2>Dashboard Statistik &amp; Navigasi</h2>
+            <p>Panel Statistik Spasial, KHG Restorasi Gambut, dan Quick Zoom</p>
+        </div>
+    </div>
+    <div class="slide-body col-2">
+        <div class="col-left">
+            <div class="img-container row" style="gap: 4mm;">
+                <div>
+                    <img src="ss6_stats_panel.png" class="screenshot" style="max-height:100mm;" alt="Panel Statistik">
+                    <div class="img-caption">Gambar 5. Panel Statistik Spasial</div>
+                </div>
+                <div>
+                    <img src="ss7_khg_gambut.png" class="screenshot" style="max-height:100mm;" alt="KHG Gambut">
+                    <div class="img-caption">Gambar 6. KHG Gambut &amp; Quick Zoom</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-right">
+            <div class="text-block">
+                <h3>Ringkasan Statistik</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>Wilayah</h4>
+                        <p>53,45 M Hektar (5 Provinsi)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Gambut KHG</h4>
+                        <p>1,91 M Hektar (6 Kawasan)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Jalan Trans</h4>
+                        <p>2.568 Kilometer (4 Poros)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Posko &amp; Kota</h4>
+                        <p>11 Titik (6 Kota &amp; 5 Posko)</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top:4mm;">Status Mitigasi per Provinsi</h3>
+                <ul>
+                    <li><span class="status-indicator status-red">Siaga I</span> Kalteng: 15,35 M Ha</li>
+                    <li><span class="status-indicator status-red">Siaga I</span> Kaltim: 12,69 M Ha</li>
+                    <li><span class="status-indicator status-orange">Siaga II</span> Kalbar: 14,70 M Ha</li>
+                    <li><span class="status-indicator status-orange">Siaga II</span> Kalsel: 3,71 M Ha</li>
+                    <li><span class="status-indicator status-yellow">Waspada</span> Kaltara: 7,01 M Ha</li>
+                </ul>
+
+                <h3 style="margin-top:4mm;">KHG Restorasi Gambut</h3>
+                <p>Total <strong>1.907.100 Ha</strong> meliputi:</p>
+                <ul>
+                    <li>Kahayan - Sebangau: 582.400 Ha</li>
+                    <li>Kapuas - Barito (Eks-PLG): 445.200 Ha</li>
+                    <li>Sungai Pawan - Tolak: 312.000 Ha</li>
+                    <li>Danau Panggang: 218.000 Ha</li>
+                </ul>
+
+                <h3 style="margin-top:4mm;">Fokus Wilayah (Quick Zoom)</h3>
+                <p>6 tombol navigasi cepat ke masing-masing provinsi dan kawasan gambut.</p>
+            </div>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 5</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 7: CUACA & ANGIN REAL-TIME ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">6</div>
+        <div class="slide-header-text">
+            <h2>Fitur Cuaca &amp; Angin Real-Time</h2>
+            <p>Radar Cuaca RainViewer dan Vektor Angin dari Open-Meteo API</p>
+        </div>
+    </div>
+    <div class="slide-body col-2">
+        <div class="col-left wide">
+            <div class="img-container">
+                <img src="ss8_wind_satellite.png" class="screenshot" style="max-height:120mm;" alt="Wind Vectors on Satellite">
+                <div class="img-caption">Gambar 7. Vektor angin real-time di atas basemap Esri Satellite dengan legenda</div>
+            </div>
+        </div>
+        <div class="col-right narrow">
+            <div class="text-block">
+                <h3>Radar Cuaca (RainViewer)</h3>
+                <ul>
+                    <li>Overlay radar curah hujan real-time</li>
+                    <li>Update otomatis setiap 10 menit</li>
+                    <li>Sumber: RainViewer API (gratis)</li>
+                    <li>Membantu identifikasi area hujan yang dapat menekan titik api</li>
+                </ul>
+
+                <h3 style="margin-top:4mm;">Vektor Angin (Open-Meteo)</h3>
+                <ul>
+                    <li>8 stasiun cuaca tersebar di seluruh Kalimantan</li>
+                    <li>Data real-time: kecepatan &amp; arah angin</li>
+                    <li>Ditampilkan sebagai marker panah arah dengan label kecepatan (km/j)</li>
+                    <li>Popup detail: suhu, kelembaban, kecepatan &amp; arah angin</li>
+                </ul>
+
+                <div class="highlight" style="margin-top:4mm;">
+                    <strong>Manfaat untuk Mitigasi Karhutla:</strong><br>
+                    Arah dan kecepatan angin menentukan potensi penyebaran asap dan api. Data curah hujan membantu memprediksi area yang lebih aman atau berisiko tinggi.
+                </div>
+
+                <h3 style="margin-top:4mm;">Teknologi API</h3>
+                <div style="margin-top:2mm;">
+                    <span class="tech-badge green">Open-Meteo API</span>
+                    <span class="tech-badge">RainViewer API</span>
+                    <span class="tech-badge orange">Leaflet Markers</span>
+                    <span class="tech-badge purple">Real-Time Data</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 6</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 8: TAMPILAN BROWSER ===================== -->
+<div class="slide slide-content">
+    <div class="slide-header">
+        <div class="slide-number">7</div>
+        <div class="slide-header-text">
+            <h2>Deployment &amp; Akses Publik</h2>
+            <p>WebGIS Live di GitHub Pages</p>
+        </div>
+    </div>
+    <div class="slide-body col-1">
+        <div class="img-container">
+            <img src="ss9_full_browser.png" class="screenshot screenshot-full" alt="Full Browser View">
+            <div class="img-caption">Gambar 8. Tampilan WebGIS pada browser dengan URL GitHub Pages yang dapat diakses publik</div>
+        </div>
+        <div class="text-block" style="margin-top: 3mm;">
+            <div class="feature-grid" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="feature-card">
+                    <h4>Platform Hosting</h4>
+                    <p>GitHub Pages (gratis, tanpa batas waktu)</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Repository</h4>
+                    <p>github.com/zeolit404/WebGIS_Leaflet-Karhutla</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Teknologi Stack</h4>
+                    <p>HTML + CSS + JavaScript + Leaflet.js (client-side rendering)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="slide-footer">
+        <span>WebGIS Interaktif Kalimantan &mdash; M. Arief Abdillah (V126241003)</span>
+        <span>Slide 7</span>
+    </div>
+</div>
+
+<!-- ===================== SLIDE 9: PENUTUP ===================== -->
+<div class="slide slide-closing">
+    <div class="cover-bg-pattern"></div>
+    <div class="cover-top-bar"></div>
+    <div class="closing-content">
+        <div class="closing-title">Terima Kasih</div>
+
+        <div class="closing-link-box">
+            <div class="label">Akses WebGIS Secara Online:</div>
+            <div class="url">https://zeolit404.github.io/WebGIS_Leaflet-Karhutla/</div>
+        </div>
+
+        <div class="closing-thanks">
+            WebGIS Interaktif Kalimantan &mdash; Mitigasi Karhutla
+        </div>
+
+        <div class="closing-info">
+            M. Arief Abdillah &mdash; V126241003<br>
+            D4 Penginderaan Jauh &amp; Sistem Informasi Geografis<br>
+            Fakultas Vokasi &mdash; Universitas Hasanuddin<br><br>
+            Dosen Pengampu: Andang Suryana Soma, S.Hut., MP., Ph.D.
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

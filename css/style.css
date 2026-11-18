@@ -102,12 +102,124 @@ body {
     color: #1c7ed6;
 }
 
+/* Filter Controls Group (Pilar 4: CQL_FILTER Server-Side) */
+.filter-controls-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filter-select-wrapper .filter-icon {
+    position: absolute;
+    left: 8px;
+    font-size: 10px;
+    color: #64748b;
+    pointer-events: none;
+}
+
+.filter-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 4px 24px 4px 22px;
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 600;
+    color: #1e293b;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+}
+
+.filter-select-wrapper select:hover,
+.filter-select-wrapper select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.btn-filter-reset {
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.btn-filter-reset:hover {
+    background: #cbd5e1;
+    color: #0f172a;
+}
+
+.stat-chip.sync-chip {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.stat-chip.timer-chip {
+    background: #f8fafc;
+    color: #0284c7;
+    border: 1px solid #e2e8f0;
+}
+
+.btn-home-view {
+    background: #1d3557;
+    color: #fff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s;
+}
+
+.btn-home-view:hover {
+    background: #457b9d;
+}
+
+/* Fire Marker Animation (Pilar 3) */
+@keyframes fire-pulse-anim {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+    70% { transform: scale(1.18); box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+.fire-pulse {
+    animation: fire-pulse-anim 1.5s infinite;
+}
+
 /* Sidebar Statistik Geospasial (Sisi Kiri) */
 .stats-sidebar-left {
     position: absolute;
     top: 85px;
     left: 20px;
-    width: 310px;
+    width: 330px;
     max-height: calc(100vh - 135px);
     z-index: 1000;
     background: rgba(255, 255, 255, 0.94);

@@ -62,14 +62,15 @@ var baseMaps = {
 };
 
 var overlayMaps = {
-    "<span style='font-weight:600; color:#1d3557;'><i class='fas fa-landmark'></i> Batas Administrasi</span>": adminLayer,
+    "<span style='font-weight:600; color:#1d3557;'><i class='fas fa-landmark'></i> Batas Administrasi (Vektor)</span>": adminLayer,
     "<span style='font-weight:600; color:#2a9d8f;'><i class='fas fa-tree'></i> Tutupan Lahan (KHG Gambut)</span>": tutupanLahanLayer,
     "<span style='font-weight:600; color:#d90429;'><i class='fas fa-road'></i> Jaringan Jalan Trans-Kalimantan</span>": jalanLayer,
     "<span style='font-weight:600; color:#0077b6;'><i class='fas fa-water'></i> Jaringan Sungai Utama</span>": sungaiLayer,
     "<span style='font-weight:600; color:#e63946;'><i class='fas fa-map-marker-alt'></i> Toponim & Posko Pantau</span>": toponimLayer,
     "<span style='font-weight:600; color:#0284c7;'><i class='fas fa-cloud-showers-heavy'></i> Radar Cuaca (RainViewer)</span>": weatherRadarLayer,
     "<span style='font-weight:600; color:#0d9488;'><i class='fas fa-wind'></i> Pergerakan & Arah Angin</span>": windLayer,
-    "<span style='font-weight:600; color:#6c757d;'><i class='fas fa-globe'></i> Layanan WMS GeoServer (Opsional)</span>": wmsGeoServerAdmin
+    "<span style='font-weight:600; color:#64748b;'><i class='fas fa-th'></i> WMS GWC: Batas Provinsi (Pilar 1)</span>": wmsGeoServerAdmin,
+    "<span style='font-weight:600; color:#ef4444;'><i class='fas fa-fire-alt'></i> WMS GWC: Karhutla (Pilar 1)</span>": wmsGeoServerKarhutla
 };
 
 // 5. Menambahkan Kendali Lapisan Peta (L.control.layers - Slide 13)
@@ -135,8 +136,21 @@ function toggleLegend() {
     }
 }
 
-// 10. Fungsi Navigasi Zoom Cepat ke Wilayah
+// 10. Fungsi Navigasi Zoom Cepat ke Wilayah & Filter Interaktif (Pilar 4)
 function zoomToRegion(region) {
+    if (typeof KarhutlaState !== 'undefined') {
+        const provMap = {
+            'kalteng': 'Kalimantan Tengah',
+            'kaltim': 'Kalimantan Timur',
+            'kalbar': 'Kalimantan Barat',
+            'kalsel': 'Kalimantan Selatan',
+            'kaltara': 'Kalimantan Utara',
+            'gambut': 'semua'
+        };
+        KarhutlaState.selectedProv = provMap[region] || 'semua';
+        if (typeof filterDanRender === 'function') filterDanRender();
+    }
+
     if (region === 'kalteng') {
         map.flyTo([-1.5, 113.8], 7, { duration: 1.2 });
     } else if (region === 'kaltim') {

@@ -209,14 +209,25 @@ var toponimLayer = L.geoJson(null, {
     }
 });
 
-// 6. Layer WMS Integrasi Langsung dari GeoServer (Slide 12 & 14)
-var wmsGeoServerAdmin = L.tileLayer.wms('http://localhost:8080/geoserver/karhutla_kalimantan/wms', {
-    layers: 'karhutla_kalimantan:batas_provinsi_kalimantan',
+// 6. Layer WMS Integrasi Langsung dari GeoServer & GeoWebCache (Pilar 1: Tile Caching)
+var wmsGeoServerAdmin = L.tileLayer.wms('/geoserver/praktikum/wms', {
+    layers: 'praktikum:batas_provinsi_kalimantan',
+    styles: 'batas_provinsi_kalimantan_style',
+    format: 'image/png',
+    transparent: true,
+    opacity: 0.6,
+    version: '1.1.1',
+    tiled: true, // Tile Caching GeoWebCache
+    attribution: 'Layanan WMS Batas GeoServer (GWC Symbology Tematik)'
+});
+
+var wmsGeoServerKarhutla = L.tileLayer.wms('/geoserver/praktikum/wms', {
+    layers: 'praktikum:kejadian_karhutla_kalimantan',
     format: 'image/png',
     transparent: true,
     version: '1.1.1',
-    styles: 'karhutla_provinsi_style',
-    attribution: 'Layanan WMS GeoServer UNHAS'
+    tiled: true,
+    attribution: 'Layanan WMS Titik Karhutla GeoServer (GWC)'
 });
 
 // 7. Fungsi Memuat Data Spasial (Mendukung file:// lokal langsung & fetch http)

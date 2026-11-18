@@ -25,23 +25,73 @@
     <!-- 1. Header Navbar Mengambang (Floating Glassmorphism Navbar) -->
     <nav class="navbar-floating">
         <div class="brand-badge">
-            <i class="fas fa-globe-asia"></i>
+            <i class="fas fa-fire-alt"></i>
         </div>
         <div class="brand-text">
-            <h1>WebGIS Interaktif Kalimantan</h1>
-            <p>Batas Administrasi, Jaringan Jalan, Sungai, Toponim & Tutupan Lahan</p>
+            <h1>WebGIS Karhutla & Monitoring Kalimantan</h1>
+            <p>Integrasi OGC WMS (Tile Cache), WFS (CQL Filter, Real-time 60s) & Dashboard</p>
         </div>
+
+        <!-- Filter Temporal & Status (Pilar 4: Server-Side CQL_FILTER) -->
+        <div class="filter-controls-group">
+            <div class="filter-select-wrapper">
+                <i class="fas fa-calendar-alt filter-icon"></i>
+                <select id="filterTahunSelect" onchange="setFilterTahun(this.value)" title="Pilih Tahun Kejadian">
+                    <option value="semua">Semua Tahun (2024-2026)</option>
+                    <option value="2024">Tahun 2024</option>
+                    <option value="2025">Tahun 2025</option>
+                    <option value="2026">Tahun 2026</option>
+                </select>
+            </div>
+
+            <div class="filter-select-wrapper">
+                <i class="fas fa-calendar-day filter-icon"></i>
+                <select id="filterBulanSelect" onchange="setFilterBulan(this.value)" title="Pilih Bulan">
+                    <option value="semua">Semua Bulan</option>
+                    <option value="1">Januari</option>
+                    <option value="2">Februari</option>
+                    <option value="3">Maret</option>
+                    <option value="4">April</option>
+                    <option value="5">Mei</option>
+                    <option value="6">Juni</option>
+                    <option value="7">Juli (Puncak Kemarau)</option>
+                    <option value="8">Agustus (Puncak Kemarau)</option>
+                    <option value="9">September (Puncak El-Nino)</option>
+                    <option value="10">Oktober (Puncak El-Nino)</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+                </select>
+            </div>
+
+            <div class="filter-select-wrapper">
+                <i class="fas fa-fire-extinguisher filter-icon"></i>
+                <select id="filterStatusSelect" onchange="setFilterStatus(this.value)" title="Status Penanganan">
+                    <option value="semua">Semua Status</option>
+                    <option value="Dalam Pemadaman">Dalam Pemadaman</option>
+                    <option value="Pendinginan">Pendinginan</option>
+                    <option value="Padam">Padam</option>
+                </select>
+            </div>
+
+            <button class="btn-filter-reset" onclick="resetAllFilter()" title="Reset Semua Filter">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+
         <div class="quick-stats">
-            <span class="stat-chip danger"><i class="fas fa-fire"></i> Siaga I: Kalteng & Kaltim</span>
-            <span class="stat-chip warning"><i class="fas fa-exclamation-triangle"></i> Siaga II: Kalbar & Kalsel</span>
-            <span class="stat-chip info"><i class="fas fa-shield-alt"></i> Waspada: Kaltara</span>
-            <button onclick="resetMapView()" style="background:#1d3557; color:#fff; border:none; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:5px;">
-                <i class="fas fa-home"></i> Home View
+            <span class="stat-chip sync-chip" id="syncStatusText">
+                <i class="fas fa-spinner fa-spin"></i> WFS Sync...
+            </span>
+            <span class="stat-chip timer-chip" title="Interval Auto-Refresh WFS 60 Detik (Pilar 4)">
+                <i class="fas fa-sync-alt fa-spin-pulse"></i> <span id="timerText">60s</span>
+            </span>
+            <button onclick="resetMapView()" class="btn-home-view" title="Kembali ke Tampilan Awal">
+                <i class="fas fa-home"></i> Home
             </button>
         </div>
     </nav>
 
-    <!-- 1b. Panel Statistik Geospasial Sisi Kiri (Dashboard Metrics) -->
+    <!-- 1b. Panel Statistik Geospasial Sisi Kiri (Decoupled Dashboard - Pilar 3) -->
     <aside class="stats-sidebar-left" id="statsSidebar">
         <!-- Header Panel -->
         <div class="stats-header">
@@ -50,8 +100,8 @@
                     <i class="fas fa-chart-pie"></i>
                 </div>
                 <div class="stats-header-text">
-                    <h3>Statistik Spasial</h3>
-                    <p>Kalimantan Monitoring Dashboard</p>
+                    <h3>Statistik Karhutla</h3>
+                    <p>Live Monitoring Dashboard (WFS)</p>
                 </div>
             </div>
             <button class="btn-toggle-sidebar" id="btnToggleSidebar" onclick="toggleStatsSidebar()" title="Sembunyikan / Tampilkan Panel">
@@ -61,142 +111,70 @@
 
         <!-- Body Panel -->
         <div class="stats-body">
-            <!-- 1. Grid Metrik Utama (KPIs) -->
+            <!-- 1. Grid Metrik Utama (3 Kartu KPI Aktual) -->
             <div class="metric-grid">
                 <div class="metric-card">
+                    <div class="label"><i class="fas fa-fire" style="color:#e63946;"></i> Hotspot</div>
+                    <div class="value" id="kpiTotalHotspot">0 Titik</div>
+                    <div class="subtext">WFS Live Query</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label"><i class="fas fa-burn" style="color:#d90429;"></i> Luas Terdampak</div>
+                    <div class="value" id="kpiTotalLuas">0 Ha</div>
+                    <div class="subtext">Area Terbakar</div>
+                </div>
+                <div class="metric-card">
+                    <div class="label"><i class="fas fa-bolt" style="color:#f59e0b;"></i> Rata FRP</div>
+                    <div class="value" id="kpiRataFrp">0 MW</div>
+                    <div class="subtext">Radiasi Termal</div>
+                </div>
+                <div class="metric-card">
                     <div class="label"><i class="fas fa-map-marked-alt" style="color:#1d3557;"></i> Wilayah</div>
-                    <div class="value">53,45 M</div>
-                    <div class="subtext">Hektar (5 Provinsi)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label"><i class="fas fa-seedling" style="color:#2a9d8f;"></i> Gambut KHG</div>
-                    <div class="value">1,91 M</div>
-                    <div class="subtext">Hektar (6 Kawasan)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label"><i class="fas fa-road" style="color:#d90429;"></i> Jalan Trans</div>
-                    <div class="value">2.568</div>
-                    <div class="subtext">Kilometer (4 Poros)</div>
-                </div>
-                <div class="metric-card">
-                    <div class="label"><i class="fas fa-map-pin" style="color:#e63946;"></i> Posko & Kota</div>
-                    <div class="value">11 Titik</div>
-                    <div class="subtext">6 Kota & 5 Posko</div>
+                    <div class="value">5 Prov</div>
+                    <div class="subtext">53,45 M Hektar</div>
                 </div>
             </div>
 
-            <!-- 2. Status Kerawanan Karhutla per Provinsi -->
+            <!-- 2. Chart 1: Bar Chart Luas Terbakar per Provinsi -->
             <div class="stat-section-card">
                 <div class="stat-section-title">
-                    <span><i class="fas fa-shield-alt"></i> Status Mitigasi Karhutla</span>
-                    <span style="font-size:9.5px; color:#64748b; font-weight:normal;">Luas (Ha)</span>
+                    <span><i class="fas fa-chart-bar" style="color:#e63946;"></i> Luas Terbakar per Prov</span>
+                    <span style="font-size:9.5px; color:#64748b; font-weight:600;">(Ha)</span>
                 </div>
-
-                <!-- Kalteng -->
-                <div class="prov-stat-row">
-                    <div class="prov-stat-info">
-                        <span class="prov-stat-name">
-                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#E63946;"></span>
-                            Kalimantan Tengah (Siaga I)
-                        </span>
-                        <span class="prov-stat-val">15,35 M Ha</span>
-                    </div>
-                    <div class="prov-progress-bg">
-                        <div class="prov-progress-fill" style="width: 28.7%; background: #E63946;"></div>
-                    </div>
-                </div>
-
-                <!-- Kaltim -->
-                <div class="prov-stat-row">
-                    <div class="prov-stat-info">
-                        <span class="prov-stat-name">
-                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#E63946;"></span>
-                            Kalimantan Timur (Siaga I)
-                        </span>
-                        <span class="prov-stat-val">12,69 M Ha</span>
-                    </div>
-                    <div class="prov-progress-bg">
-                        <div class="prov-progress-fill" style="width: 23.7%; background: #E63946;"></div>
-                    </div>
-                </div>
-
-                <!-- Kalbar -->
-                <div class="prov-stat-row">
-                    <div class="prov-stat-info">
-                        <span class="prov-stat-name">
-                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#F4A261;"></span>
-                            Kalimantan Barat (Siaga II)
-                        </span>
-                        <span class="prov-stat-val">14,70 M Ha</span>
-                    </div>
-                    <div class="prov-progress-bg">
-                        <div class="prov-progress-fill" style="width: 27.5%; background: #F4A261;"></div>
-                    </div>
-                </div>
-
-                <!-- Kalsel -->
-                <div class="prov-stat-row">
-                    <div class="prov-stat-info">
-                        <span class="prov-stat-name">
-                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#F4A261;"></span>
-                            Kalimantan Selatan (Siaga II)
-                        </span>
-                        <span class="prov-stat-val">3,71 M Ha</span>
-                    </div>
-                    <div class="prov-progress-bg">
-                        <div class="prov-progress-fill" style="width: 6.9%; background: #F4A261;"></div>
-                    </div>
-                </div>
-
-                <!-- Kaltara -->
-                <div class="prov-stat-row">
-                    <div class="prov-stat-info">
-                        <span class="prov-stat-name">
-                            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#E9C46A;"></span>
-                            Kalimantan Utara (Waspada)
-                        </span>
-                        <span class="prov-stat-val">7,01 M Ha</span>
-                    </div>
-                    <div class="prov-progress-bg">
-                        <div class="prov-progress-fill" style="width: 13.1%; background: #E9C46A;"></div>
-                    </div>
+                <div style="height: 135px; width: 100%; position: relative;">
+                    <canvas id="chartBarProv"></canvas>
                 </div>
             </div>
 
-            <!-- 3. Kawasan Hidrologis Gambut (KHG) Rentan -->
+            <!-- 3. Chart 2: Line Chart Tren Kejadian Bulanan -->
             <div class="stat-section-card">
                 <div class="stat-section-title">
-                    <span><i class="fas fa-tree" style="color:#2a9d8f;"></i> KHG Restorasi Gambut</span>
-                    <span style="font-size:9.5px; color:#2a9d8f; font-weight:700;">1.907.100 Ha</span>
+                    <span><i class="fas fa-chart-line" style="color:#f4a261;"></i> Tren Hotspot Bulanan</span>
+                    <span style="font-size:9.5px; color:#64748b; font-weight:600;">(Titik)</span>
                 </div>
-                <div style="font-size: 11px; color:#475569; display: flex; flex-direction:column; gap: 5px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:4px 8px; border-radius:6px;">
-                        <span><b>Kahayan - Sebangau</b></span>
-                        <span style="background:#ffe3e3; color:#d90429; padding:2px 6px; border-radius:4px; font-size:9.5px; font-weight:700;">582.400 Ha</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:4px 8px; border-radius:6px;">
-                        <span><b>Kapuas - Barito</b> (Eks-PLG)</span>
-                        <span style="background:#ffe3e3; color:#d90429; padding:2px 6px; border-radius:4px; font-size:9.5px; font-weight:700;">445.200 Ha</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:4px 8px; border-radius:6px;">
-                        <span><b>Sungai Pawan - Tolak</b></span>
-                        <span style="background:#fff3bf; color:#f08c00; padding:2px 6px; border-radius:4px; font-size:9.5px; font-weight:700;">312.000 Ha</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; padding:4px 8px; border-radius:6px;">
-                        <span><b>Danau Panggang</b></span>
-                        <span style="background:#fff3bf; color:#f08c00; padding:2px 6px; border-radius:4px; font-size:9.5px; font-weight:700;">218.000 Ha</span>
-                    </div>
+                <div style="height: 125px; width: 100%; position: relative;">
+                    <canvas id="chartLineTrend"></canvas>
                 </div>
             </div>
 
-            <!-- 4. Navigasi Cepat Antar-Wilayah (Quick Zoom) -->
+            <!-- 4. Chart 3: Doughnut Chart Gambut KHG vs Non-Gambut -->
+            <div class="stat-section-card">
+                <div class="stat-section-title">
+                    <span><i class="fas fa-chart-pie" style="color:#2a9d8f;"></i> Hotspot Gambut vs Mineral</span>
+                </div>
+                <div style="height: 130px; width: 100%; position: relative;">
+                    <canvas id="chartDoughnutGambut"></canvas>
+                </div>
+            </div>
+
+            <!-- 5. Navigasi Cepat Antar-Wilayah (Quick Zoom) -->
             <div class="stat-section-card">
                 <div class="stat-section-title">
                     <span><i class="fas fa-crosshairs"></i> Fokus Wilayah (Zoom)</span>
                 </div>
                 <div class="quick-nav-group">
                     <button class="nav-chip-btn" onclick="zoomToRegion('kalteng')"><i class="fas fa-search-location"></i> Kalteng</button>
-                    <button class="nav-chip-btn" onclick="zoomToRegion('kaltim')"><i class="fas fa-search-location"></i> Kaltim / IKN</button>
+                    <button class="nav-chip-btn" onclick="zoomToRegion('kaltim')"><i class="fas fa-search-location"></i> Kaltim</button>
                     <button class="nav-chip-btn" onclick="zoomToRegion('kalbar')"><i class="fas fa-search-location"></i> Kalbar</button>
                     <button class="nav-chip-btn" onclick="zoomToRegion('kalsel')"><i class="fas fa-search-location"></i> Kalsel</button>
                     <button class="nav-chip-btn" onclick="zoomToRegion('kaltara')"><i class="fas fa-search-location"></i> Kaltara</button>
@@ -286,6 +264,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+    <!-- 5b. Chart.js 4.4.1 (Decoupled Geospatial Dashboard - Pilar 3) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
     <!-- 6. Data Bundles (Mendukung file:// & offline) -->
     <script src="data/administrasi.js"></script>
     <script src="data/jalan.js"></script>
@@ -296,6 +277,9 @@
     <!-- 7. Custom Scripts (Slide 18: File Terpisah & Terorganisir) -->
     <script src="js/layers.js"></script>
     <script src="js/map.js"></script>
+
+    <!-- 8. Dashboard OGC WMS/WFS & Real-time Polling (Pilar 1, 2, 3, 4) -->
+    <script src="js/karhutla_dashboard.js"></script>
 
 </body>
 </html>
