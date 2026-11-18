@@ -17,7 +17,7 @@ Aplikasi WebGIS ini telah dipublikasikan dan dapat diakses secara langsung melal
 * **Program Studi**: D4 Penginderaan Jauh dan Sistem Informasi Geografis
 * **Fakultas**: Fakultas Vokasi, Universitas Hasanuddin
 * **Mata Kuliah**: Praktek Pengelolaan Big Data dan WebGIS (Semester 5)
-* **Dosen Pengampu**: Andang Suryana Soma, S.Hut., MP., Ph.D.
+* **Dosen Pengampu**: Hari Kurniadi (Praktisi BIG)
 * **Tugas**: Proyek Peta WebGIS Menggunakan Leaflet (Modul 5)
 
 ---

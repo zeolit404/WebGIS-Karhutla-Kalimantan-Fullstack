@@ -1,7 +1,7 @@
 /* ========================================================
    WEBGIS LEAFLET - INISIALISASI PETA DASAR & KONTROL
    Materi Rujukan: Slide Kuliah Pengenalan WebGIS Leaflet
-   Dosen: Andang Suryana Soma, S.Hut., MP., Ph.D
+   Dosen: Hari Kurniadi (Praktisi BIG)
    ======================================================== */
 
 // 1. Inisialisasi Peta (Map Initialization - Slide 7 & 8)
